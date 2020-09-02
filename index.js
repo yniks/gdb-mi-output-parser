@@ -15,7 +15,7 @@ if (!String.prototype.replaceAll)
         return es6fix(this,...arg)
     }
 }
-const RE_GDBMI_OUTPUT=()=>/^(\d*)?(.)\b([a-zA-Z/-]*?),([\s\S]*?)(\(gdb\))??\n$/g
+const RE_GDBMI_OUTPUT=()=>/^(\d*)?(.)\b([a-zA-Z/-]*?),([\s\S]*?)$/g
 const RE_GDBMI_OUTPUT_CONSOLE=()=>/^(\d*)?(~)(.*?)\n$/g
 const RE_GDBMI_KEYS=()=>/([^"]|^)\b([\w\-]*)\b(=)/g
 const outputtypeSymbolMap={
@@ -36,8 +36,8 @@ function parserecord(listText)
 function parseGDBMIOutputLine(line)
 {
     try{
-        var [_,token,asyncOutputSymbol,resultClass,recordList,isLast]=RE_GDBMI_OUTPUT().exec(line)
-        return Object.assign(parserecord(recordList),{token,'async-type':outputtypeSymbolMap[asyncOutputSymbol],"class":resultClass,sequenceEnd:!!isLast})
+        var [_,token,asyncOutputSymbol,resultClass,recordList]=RE_GDBMI_OUTPUT().exec(line)
+        return Object.assign(parserecord(recordList),{token,'async-type':outputtypeSymbolMap[asyncOutputSymbol],"class":resultClass})
     }
     catch(e)
     {
@@ -52,7 +52,7 @@ function parseGDBMIOutputLine(line)
         }
         catch(e)
         {
-            throw "Illegal GDGMI output string!\nString must match 'RE_GDBMI_OUTPUT'"
+            return new Error("Illegal GDGMI output string!\nString must match 'RE_GDBMI_OUTPUT'")
         }
     }
 }
