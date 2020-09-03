@@ -16,7 +16,7 @@ if (!String.prototype.replaceAll)
     }
 }
 const RE_GDBMI_OUTPUT=()=>/^(\d*)?(.)\b([a-zA-Z/-]*?),([\s\S]*?)$/g
-const RE_GDBMI_OUTPUT_CONSOLE=()=>/^(\d*)?(~)(.*?)\n$/g
+const RE_GDBMI_OUTPUT_CONSOLE=()=>/^(\d*)?(~|&|@)(.*?)\n$/g
 const RE_GDBMI_KEYS=()=>/([^"]|^)\b([\w\-]*)\b(=)/g
 const outputtypeSymbolMap={
     '^':"result-record",
@@ -46,7 +46,7 @@ function parseGDBMIOutputLine(line)
             var [_,token,asyncOutputSymbol,text]=RE_GDBMI_OUTPUT_CONSOLE().exec(line)
             return {
                 token,
-                'async-type':outputtypeSymbolMap[asyncOutputSymbol],
+                'stream-type':outputtypeSymbolMap[asyncOutputSymbol],
                text
             }
         }
