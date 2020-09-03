@@ -1,5 +1,5 @@
 {
-  "name": "gdbmi-parser",
+  "name": "gdb-mi-output-parser",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
