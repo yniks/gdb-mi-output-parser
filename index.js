@@ -52,6 +52,13 @@ function parseGDBMIOutputLine(line)
         }
         catch(e)
         {
+            if (line.match(/^\(gdb\)/))
+            {
+                return {
+                    sequenceEnded:true,
+                    text:line
+                }
+            }
             return new Error("Illegal GDGMI output string!\nString must match 'RE_GDBMI_OUTPUT'")
         }
     }
