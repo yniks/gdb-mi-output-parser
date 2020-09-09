@@ -7,6 +7,7 @@
 //^result-record
 
 //fix eS6
+var {Transform}=require('stream')
 if (!String.prototype.replaceAll)
 {
     var es6fix=require('string.prototype.replaceall')
@@ -35,7 +36,7 @@ function parserecord(listText)
 var partbuffer=''
 function parseGDBMIOutputLine(line)
 {
-    if(line===null){ partbuffer='';return}
+    if(line===undefined){ partbuffer='';return}
     try{
         var [_,token,asyncOutputSymbol,resultClass,_,recordList='']=RE_GDBMI_OUTPUT().exec(line)
         return Object.assign(parserecord(recordList),{token,'async-type':outputtypeSymbolMap[asyncOutputSymbol],"class":resultClass})
@@ -74,4 +75,22 @@ function parseGDBMIOutputLine(line)
         }
     }
 }
-module.exports={parseGDBMIOutputLine,parseLine:parseGDBMIOutputLine,parserecord}
+class ParserTransformer extends Transform {
+    constructor() {
+      super({
+        readableObjectMode: true,
+        writableObjectMode: true
+      })
+    }
+  
+    _transform(chunk, encoding, next) {
+      /**
+       *  Support streaming feature of GDBMI parser
+       */
+        var output=parseGDBMIOutputLine(chunk)
+        if(output!==undefined) this.push(output)
+        return next(null)        
+    }
+  }
+
+module.exports={parseGDBMIOutputLine,parseLine:parseGDBMIOutputLine,parserecord,ParserTransformer}
