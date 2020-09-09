@@ -1,4 +1,7 @@
-# Super Light GDG/MI output parser
+# javascript GDB/MI parser
+## Features
+- supports partial input, it can wait for more input to deliver final result
+- supports all of the six types of GDB/MI output types
 
 ## Usage:
 #### Example raw MI output:

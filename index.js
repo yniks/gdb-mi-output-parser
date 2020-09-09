@@ -35,7 +35,7 @@ function parserecord(listText)
 var partbuffer=''
 function parseGDBMIOutputLine(line)
 {
-    if(line===null)return !(partbuffer='')
+    if(line===null){ partbuffer='';return}
     try{
         var [_,token,asyncOutputSymbol,resultClass,_,recordList='']=RE_GDBMI_OUTPUT().exec(line)
         return Object.assign(parserecord(recordList),{token,'async-type':outputtypeSymbolMap[asyncOutputSymbol],"class":resultClass})
