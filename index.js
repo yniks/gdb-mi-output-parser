@@ -6,7 +6,7 @@
 //&log-stream-output: contains on-going status information about the progress of a slow operation. It can be discarded.
 //^result-record
 
-//fix
+//fix eS6
 if (!String.prototype.replaceAll)
 {
     var es6fix=require('string.prototype.replaceall')
@@ -32,9 +32,10 @@ function parserecord(listText)
     var str=(`{${listText.replaceAll(RE_GDBMI_KEYS(),(_,pre,word,eq)=> pre.trim()+'"'+word+'":')}}`)
     return  JSON.parse(str)
 }
-
+var partbuffer=''
 function parseGDBMIOutputLine(line)
 {
+    if(line===null)return !(partbuffer='')
     try{
         var [_,token,asyncOutputSymbol,resultClass,_,recordList='']=RE_GDBMI_OUTPUT().exec(line)
         return Object.assign(parserecord(recordList),{token,'async-type':outputtypeSymbolMap[asyncOutputSymbol],"class":resultClass})
@@ -52,14 +53,24 @@ function parseGDBMIOutputLine(line)
         }
         catch(e)
         {
-            if (line.match(/^\(gdb\)/))
+            if(line.match(/^\(gdb\)/))
             {
                 return {
                     sequenceEnded:true,
                     text:line
                 }
             }
-            return new Error("Illegal GDGMI output string!\nString must match 'RE_GDBMI_OUTPUT'")
+            else if(!!partbuffer)
+            {
+                var newline=partbuffer+line;
+                partbuffer=''
+                var result=parseGDBMIOutputLine(newline)//new Error("Illegal GDGMI output string!\nString must match 'RE_GDBMI_OUTPUT'")
+                if(result){
+                    return result
+                }
+                else partbuffer=newline
+            }
+            else partbuffer+=line;
         }
     }
 }
